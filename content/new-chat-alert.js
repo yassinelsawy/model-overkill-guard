@@ -19,6 +19,24 @@
   let wasOnConversation = null; // null = not yet determined (initial load)
   let lastAlertAt = 0;
 
+  // Right when a pushState-driven route change fires, the picker element can still exist in
+  // the DOM but not yet be laid out (mid-transition, e.g. briefly display:none while the SPA
+  // swaps views) — getBoundingClientRect() returns all zeros in that window. Poll a few
+  // animation frames for a real (non-zero) layout before anchoring the toast to it.
+  function waitForLayout(el, maxFrames = 15) {
+    return new Promise((resolve) => {
+      let frames = 0;
+      function check() {
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) return resolve(rect);
+        frames++;
+        if (frames >= maxFrames) return resolve(rect);
+        requestAnimationFrame(check);
+      }
+      check();
+    });
+  }
+
   async function maybeAlert() {
     if (!settings.enabled || !settings.newChatAlertsEnabled) return;
 
@@ -40,7 +58,7 @@
     if (!picker) return;
 
     const activeTier = DOM.getActiveModelTier() || "sonnet";
-    const rect = picker.getBoundingClientRect();
+    const rect = await waitForLayout(picker);
 
     const otherTiers = CONFIG.MODEL_TIER_ORDER.filter((t) => t !== activeTier);
     window.MOG_TOAST.show({

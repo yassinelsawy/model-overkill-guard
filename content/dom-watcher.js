@@ -179,26 +179,14 @@
     });
   }
 
-  // Detects SPA navigation (new chat, opening a conversation, back/forward) by patching
-  // history.pushState/replaceState — these are native History-prototype methods shared
-  // across the page's own scripts and this content script, so overriding them here also
-  // catches claude.ai's own router calling them. No page-context injection needed.
-  let historyPatched = false;
-  function patchHistoryOnce() {
-    if (historyPatched) return;
-    historyPatched = true;
-    ["pushState", "replaceState"].forEach((method) => {
-      const original = history[method];
-      history[method] = function (...args) {
-        const result = original.apply(this, args);
-        window.dispatchEvent(new Event("mog:urlchange"));
-        return result;
-      };
-    });
-  }
-
+  // Detects SPA navigation (new chat, opening a conversation, back/forward). The
+  // history.pushState/replaceState patching itself lives in main-world-nav-patch.js, injected
+  // into the page's own MAIN world (see manifest.json) — history.pushState here in the
+  // extension's isolated world is a *different* object from the page's, so claude.ai's router
+  // calling it would otherwise be invisible to this content script. That script dispatches
+  // "mog:urlchange" on `window`, which — unlike JS object references — does cross the
+  // isolated/main world boundary, so listening for it here works correctly.
   function observeUrlChanges(callback) {
-    patchHistoryOnce();
     let lastPath = window.location.pathname;
     const fireIfChanged = () => {
       const current = window.location.pathname;

@@ -7,6 +7,12 @@
   "content_scripts": [
     {
       "matches": ["https://claude.ai/*"],
+      "js": ["content/main-world-nav-patch.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://claude.ai/*"],
       "js": [
         "content/config.js",
         "content/heuristics.js",

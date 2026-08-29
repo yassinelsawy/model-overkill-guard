@@ -5,6 +5,10 @@
   function show({ title, body, actions = [], anchorRect = null, durationMs = 8000 }) {
     const theme = window.MOG_DOM.isDarkMode() ? window.MOG_CONFIG.THEME.dark : window.MOG_CONFIG.THEME.light;
 
+    // A zero-size rect means the anchor wasn't actually laid out (e.g. read mid SPA-transition)
+    // — treat it the same as no anchor rather than computing a nonsensical off-screen position.
+    if (anchorRect && anchorRect.width === 0 && anchorRect.height === 0) anchorRect = null;
+
     const host = document.createElement("div");
     host.id = "model-overkill-guard-toast";
     document.body.appendChild(host);
