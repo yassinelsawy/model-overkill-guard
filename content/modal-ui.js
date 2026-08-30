@@ -6,8 +6,11 @@
   function buildReason(signals) {
     const chips = [];
     chips.push(`${signals.wordCount} words`);
+    // Prefer a concrete matched phrase, then fall back to what the intent model keyed on.
     if (signals.matchedSimpleKeywords.length) {
       chips.push(`"${signals.matchedSimpleKeywords[0]}"`);
+    } else if (signals.topIntentTerms && signals.topIntentTerms.length) {
+      chips.push(`reads like "${signals.topIntentTerms[0]}"`);
     }
     if (signals.matchedComplexKeywords.length === 0) {
       chips.push("no complex-task keywords");

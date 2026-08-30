@@ -35,7 +35,7 @@
     if (!activeTier) return; // couldn't identify the picker; fail open rather than block sends
 
     const classification = HEURISTICS.classifyPrompt(text, settings, window.MOG_CONFIG);
-    if (!HEURISTICS.isOverkill(activeTier, classification.recommendedTier, settings, window.MOG_CONFIG)) {
+    if (!HEURISTICS.isOverkill(activeTier, classification, settings, window.MOG_CONFIG)) {
       window.MOG_LIVE_BADGE?.hide();
       return;
     }
