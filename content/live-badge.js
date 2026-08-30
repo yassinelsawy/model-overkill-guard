@@ -13,16 +13,8 @@
   const HEURISTICS = window.MOG_HEURISTICS;
   const CONFIG = window.MOG_CONFIG;
 
-  let settings = Object.assign({}, CONFIG.DEFAULTS);
-  function loadSettings() {
-    chrome.storage.sync.get(CONFIG.DEFAULTS, (stored) => {
-      settings = Object.assign({}, CONFIG.DEFAULTS, stored, { weights: CONFIG.DEFAULTS.weights });
-    });
-  }
-  loadSettings();
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "sync") loadSettings();
-  });
+  // Fixed config — there's no settings UI, so this is the single source of behavior.
+  const settings = CONFIG.DEFAULTS;
 
   let host = null;
   let shadowRoot = null;

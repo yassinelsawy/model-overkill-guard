@@ -6,20 +6,10 @@
   const HEURISTICS = window.MOG_HEURISTICS;
   const MODAL = window.MOG_MODAL;
 
-  let settings = Object.assign({}, DEFAULTS);
+  // Fixed config — there's no settings UI, so this is the single source of behavior.
+  const settings = DEFAULTS;
   let bypassNext = false;
   let processing = false;
-
-  function loadSettings() {
-    chrome.storage.sync.get(DEFAULTS, (stored) => {
-      settings = Object.assign({}, DEFAULTS, stored, { weights: DEFAULTS.weights });
-    });
-  }
-  loadSettings();
-
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "sync") loadSettings();
-  });
 
   async function onSendAttempt(event) {
     if (bypassNext) {

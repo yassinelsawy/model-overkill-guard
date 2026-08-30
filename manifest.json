@@ -3,7 +3,6 @@
   "name": "Model Overkill Guard for Claude",
   "version": "0.1.0",
   "description": "Warns you before sending a simple prompt to an overpowered (and overpriced) Claude model on claude.ai.",
-  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["https://claude.ai/*"],
@@ -28,7 +27,6 @@
     }
   ],
   "action": {
-    "default_popup": "popup/popup.html",
     "default_title": "Model Overkill Guard"
   },
   "icons": {

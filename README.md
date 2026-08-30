@@ -22,8 +22,8 @@ wrong "this is overkill" nag costs more trust than a missed one.
 1. Go to `chrome://extensions`.
 2. Enable **Developer mode** (top right).
 3. Click **Load unpacked** and select this folder.
-4. Open claude.ai — the toolbar icon opens settings (enable/disable, new-chat reminders,
-   sensitivity, custom keywords).
+4. Open claude.ai — it works immediately. There's no settings UI; the extension runs on fixed
+   defaults (`DEFAULTS` in `content/config.js`).
 
 ## What it does
 
@@ -54,7 +54,9 @@ browser alert.
   holds the example corpus, the TF-IDF vectorizer, and the per-tier centroids.
 - `content/toast.js` / `content/modal-ui.js` are the two shared UI primitives (non-blocking
   nudge vs. blocking confirmation), both Shadow DOM isolated.
-- Settings (`popup/`) are stored in `chrome.storage.sync`.
+- Behavior is fixed in `DEFAULTS` (`content/config.js`) — there is no settings UI and no storage.
+  The content scripts read that object directly, so to change behavior you edit it and reload the
+  extension. (The `storage` permission was dropped along with the settings popup.)
 
 ## Manual test checklist
 
@@ -68,8 +70,5 @@ browser alert.
   longer earns a heavy tier).
 - Short but hard prompt ("prove the four color theorem") with Opus → no pill, no modal (the intent
   model recognizes the task as Opus-worthy despite its length).
-- Toggle "Block overkill sends" off in the popup → the send-time modal never appears (pill and
-  toast are controlled by their own toggles).
-- Toggle "Remind me on new chats" off → no toast on new chat, guard/pill still work.
 - Switch to a different existing conversation and back to a new chat → toast still fires (SPA
   navigation detection survives route changes).

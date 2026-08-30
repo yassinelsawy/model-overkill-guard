@@ -5,16 +5,8 @@
   const DOM = window.MOG_DOM;
   const CONFIG = window.MOG_CONFIG;
 
-  let settings = { enabled: true, newChatAlertsEnabled: true };
-  function loadSettings() {
-    chrome.storage.sync.get(CONFIG.DEFAULTS, (stored) => {
-      settings = Object.assign({}, CONFIG.DEFAULTS, stored);
-    });
-  }
-  loadSettings();
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "sync") loadSettings();
-  });
+  // Fixed config — there's no settings UI, so this is the single source of behavior.
+  const settings = CONFIG.DEFAULTS;
 
   let wasOnConversation = null; // null = not yet determined (initial load)
   let lastAlertAt = 0;

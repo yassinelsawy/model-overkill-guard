@@ -100,7 +100,7 @@
     return TIER_ORDER[clamp(Math.round(rank), 0, 2)];
   }
 
-  // settings: merged runtime config (see interceptor.js loadSettings), config: window.MOG_CONFIG
+  // settings: the fixed config object (window.MOG_CONFIG.DEFAULTS), config: window.MOG_CONFIG
   function classifyPrompt(text, settings, config) {
     config = config || window.MOG_CONFIG;
     const preset = config.SENSITIVITY_PRESETS[settings.sensitivity] || config.SENSITIVITY_PRESETS.balanced;
