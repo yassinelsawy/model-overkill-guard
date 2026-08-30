@@ -15,6 +15,7 @@
       "matches": ["https://claude.ai/*"],
       "js": [
         "content/config.js",
+        "content/intent-model.js",
         "content/heuristics.js",
         "content/dom-watcher.js",
         "content/toast.js",

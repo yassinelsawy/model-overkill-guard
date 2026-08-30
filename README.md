@@ -2,8 +2,20 @@
 
 A Chrome extension that nudges you toward the right Claude model for the task, on
 [claude.ai](https://claude.ai) — instead of defaulting to the biggest, most expensive one for
-every prompt. No API calls, no LLM classification — pure local heuristics (prompt length +
-keyword matching).
+every prompt. No API calls, no LLM classification — everything runs locally.
+
+It judges a prompt's difficulty by blending two offline signals rather than leaning on length
+(a short "prove this theorem" is Opus work; a long "fix the grammar in this doc" is not):
+
+1. **Structural signals** (`content/heuristics.js`) — the leading imperative verb, multi-part
+   requirements, sequencing/reasoning cues, code, keyword hits, and (weakly) length.
+2. **Intent model** (`content/intent-model.js`) — TF-IDF cosine similarity of the prompt to a
+   small labeled corpus of example prompts per tier, built at load time. Improve it by adding
+   example prompts to the corpus; no weight-tuning needed.
+
+The two are merged confidence-weighted, and the guard only nudges when the combined confidence
+clears the sensitivity preset's threshold — when the signals disagree it stays quiet, because a
+wrong "this is overkill" nag costs more trust than a missed one.
 
 ## Load it
 
@@ -37,8 +49,9 @@ browser alert.
   `history.pushState`/`replaceState`. Selectors are real `data-testid` attributes cross-checked
   against [she-llac/claude-counter](https://github.com/she-llac/claude-counter) (MIT) — see
   [SELECTORS.md](SELECTORS.md) for details and what to check if claude.ai's DOM changes.
-- `content/heuristics.js` scores prompt text (length, "simple"/"complex" keyword hits, code
-  blocks) to recommend a model tier — pure functions, no DOM access, easy to unit test.
+- `content/heuristics.js` blends the structural score with the intent model to recommend a tier
+  and a confidence — pure functions, no DOM access, easy to unit test. `content/intent-model.js`
+  holds the example corpus, the TF-IDF vectorizer, and the per-tier centroids.
 - `content/toast.js` / `content/modal-ui.js` are the two shared UI primitives (non-blocking
   nudge vs. blocking confirmation), both Shadow DOM isolated.
 - Settings (`popup/`) are stored in `chrome.storage.sync`.
@@ -51,6 +64,10 @@ browser alert.
 - "Send anyway" → message sends under Opus.
 - "Switch and send" → model picker changes tier, then sends.
 - Long/complex prompt + Opus selected → no pill, no modal, sends directly.
+- Paste a long doc + "just fix the grammar" with Opus → still flagged as overkill (length alone no
+  longer earns a heavy tier).
+- Short but hard prompt ("prove the four color theorem") with Opus → no pill, no modal (the intent
+  model recognizes the task as Opus-worthy despite its length).
 - Toggle "Block overkill sends" off in the popup → the send-time modal never appears (pill and
   toast are controlled by their own toggles).
 - Toggle "Remind me on new chats" off → no toast on new chat, guard/pill still work.

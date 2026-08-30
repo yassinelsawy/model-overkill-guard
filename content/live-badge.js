@@ -75,7 +75,7 @@
     if (!picker || !activeTier) return hide();
 
     const classification = HEURISTICS.classifyPrompt(text, settings, CONFIG);
-    if (HEURISTICS.isOverkill(activeTier, classification.recommendedTier, settings, CONFIG)) {
+    if (HEURISTICS.isOverkill(activeTier, classification, settings, CONFIG)) {
       render(classification.recommendedTier, picker.getBoundingClientRect());
     } else {
       hide();
